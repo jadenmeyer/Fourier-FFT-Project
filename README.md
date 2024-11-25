@@ -11,4 +11,6 @@ This will cover a very basic introduction to how CUDA goes about parallelizing t
 
 Later, there will include code and plots (in Matlab possibly some C if I have time) for the Heat Equation and such solutions. LaTeX documentation will exist for this.
 
+If something looks off feel free to let me know, just know this is a work in progress!
+
 Free to use information. The license states no corporate use of the information. Please respect that wish! 
