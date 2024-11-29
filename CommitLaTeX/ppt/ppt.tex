@@ -1,0 +1,25 @@
+\documentclass{beamer}
+%Information to be included in the title page:
+\title{FFT Algorithim Comparison for GPUs and CPUs}
+\author{Jaden Meyer and Jayden Burr}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{FFT Algorithim}
+This is some text in the first frame. This is some text in the first frame. This is some text in the first frame.
+\end{frame}
+
+\begin{frame}
+\frametitle{GPU Speeds}
+The FFT Algorithim has time complexity of $O(NlogN)$. The average GPU has hundreds to tens of thousands of cores. It can compute things in parallel.
+
+Using an average graphics card we expect 4-8 TFLOPs ($10^{12}$ operations)
+
+For a DFT with $N = 1 million$: $ (10^6)^2 \cdot \frac{1}{4\cdot10^{12}} = some number$
+
+\end{frame}
+
+\end{document}
