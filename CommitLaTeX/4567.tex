@@ -1,6 +1,10 @@
 \documentclass{article}
 \usepackage{pgfplots, amssymb, amsmath, darkmode, fullpage, tikz,array }
 \usepackage{tcolorbox}
+\usepackage{biblatex}
+\usepackage{listings}
+\usepackage{matlab-prettifier}
+\addbibresource{4567.bib}
 \usetikzlibrary{shapes.geometric, arrows}
 \usetikzlibrary{positioning}
 
@@ -70,9 +74,55 @@
         \indent{}To demysitfy this graph, one must first understand that it is not possible to know \emph{exactly} what is happening on any set core. CUDA grids are collections of CUDA Blocks and CUDA Blocks are collections of CUDA Threads. CUDA Threads
         are the pieces of information that work on some part of the FFT. This can be doing the actual calculations, the combinations, or putting it into a new vector. If the tasks are similar enough they will get diverted to a CUDA Block. A CUDA Block is a collection of these threads. So this is 
         using the VRAM over threads to share and seperately compute information. The Block works on something called a streaming multiprocessor. This is a collection of CUDA cores on a shared piece of L1,L2 Cache (on processor memory) or VRAM. If the process stream is big enough, multiple Blocks can be executed.
-        This is called a CUDA Grid. A single streaming multiprocessor is only capable of working on Blocks. A CUDA Grid will take multiple streaming multiprocessors are use them to work on the same area of calculations, but divert tasks to Blocks. 
+        This is called a CUDA Grid. A single streaming multiprocessor is only capable of working on Blocks. A CUDA Grid will take multiple streaming multiprocessors are use them to work on the same area of calculations, but divert tasks to Blocks. \parencite{Gupta}
     \end{sloppypar}
     \begin{sloppypar}
         \indent{} The new question is now how can we look at the FFT and Matlab's utilization of CUDA parallel processing to get a better understanding of why it is more effcient.
     \end{sloppypar}
+
+    \section{Basic Results}
+    \begin{sloppypar}
+        \indent{}In this section, We will show the results of using the fft command in Matlab and the speed of dynamic arrays. 
+        
+        \begin{lstlisting}[style=Matlab-editor]
+            Gsize = 0:15000000:1000000000; 
+            timeVal = zeros(size(Gsize));
+    
+            % Pre-allocate a large enough GPU array to hold the largest matrix
+            maxSize = max(Gsize);  
+            A_gpu = gpuArray.zeros(maxSize, 1, 'single');  
+            % Pre-allocate GPU memory for column vector
+            
+            % Loop over different matrix sizes
+            for index = 1:length(Gsize)
+                N = Gsize(index);
+                
+                % Create a random matrix of size N on the CPU
+                A = single(rand(N, 1));  % Create a column vector of size N
+                
+                % Transfer the data to the GPU (only the relevant part)
+                A_gpu(1:N) = gpuArray(A);  
+                % Assign to the first N elements of the column vector
+                disp(['Processing GPU: Matrix size = ', num2str(N)]);
+                % Perform FFT on the GPU (now it's just a vector computation)
+                tic;
+                fft(A_gpu(1:N));  
+                % Perform FFT on the relevant portion of the GPU array (N x 1 vector)
+                timeVal(index) = toc;  % Record the time
+            end
+            
+            totalGPUtime = sum(timeVal)
+        \end{lstlisting}
+        This is the pseudo-code sort of thing...
+        
+    \end{sloppypar}
+\printbibliography
+
+
 \end{document}
+
+https://developer.nvidia.com/blog/cuda-refresher-cuda-programming-model/
+https://developer.nvidia.com/blog/cuda-refresher-cuda-programming-model/
+https://developer.nvidia.com/blog/cuda-refresher-cuda-programming-model/
+https://developer.nvidia.com/blog/cuda-refresher-cuda-programming-model/
+https://developer.nvidia.com/blog/cuda-refresher-cuda-programming-model/
