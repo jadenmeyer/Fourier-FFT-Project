@@ -1,4 +1,5 @@
 \documentclass{beamer}
+\usepackage{graphicx}
 %Information to be included in the title page:
 \title{FFT Algorithim Comparison for GPUs and CPUs}
 \author{Jaden Meyer and Jayden Burr}
@@ -14,12 +15,37 @@ This is some text in the first frame. This is some text in the first frame. This
 
 \begin{frame}
 \frametitle{GPU Speeds}
-The FFT Algorithim has time complexity of $O(NlogN)$. The average GPU has hundreds to tens of thousands of cores. It can compute things in parallel.
+The FFT Algorithim has time complexity of $O(NlogN)$. The average GPU has hundreds to tens of thousands of cores. It can compute things in parallel.\\
+\vspace{1mm}
+Using an average graphics card we expect 4-8 TFLOPs ($10^{12}$ operations):\\
+\vspace{1mm}
+\pause
+For a DFT with $N = 1 million$: $ (10^6)^2 \cdot \frac{1}{4\cdot10^{12}} = 0.25$ seconds\\
+\pause
+For a FFT with $N= 1 million$: $ (10^6) \cdot log_2(10^6) \cdot \frac{1}{4\cdot10^{12}} = 0.000005$ seconds\\
+\pause
+\vspace{1mm}
+That is FAST...
 
-Using an average graphics card we expect 4-8 TFLOPs ($10^{12}$ operations)
+\end{frame}
 
-For a DFT with $N = 1 million$: $ (10^6)^2 \cdot \frac{1}{4\cdot10^{12}} = some number$
+\begin{frame}
+    \frametitle{CPU Speeds}
+    A CPU has only a handful of cores. It does not use parallelization and is very weak at 'indirect' computations. Occasionally the core will use 1 or 2 threads.\\
+    \vspace{1mm}
+    \pause
+    Most modern CPUs use around 4-5GHz which means a single-core operation speed of: 0.02 TFLOPs:\\
+    For a DFT with $N = 1 million$: $ (10^6)^2 \cdot \frac{1}{0.02\cdot10^{12}} = 50$ seconds\\
+    \pause
+    For a FFT with $N= 1 million$: $ (10^6) \cdot log_2(10^6) \cdot \frac{1}{0.02\cdot10^{12}} = 0.001$ seconds\\
+    \pause
+    \vspace{1mm}
+    That is quite slow...
+\end{frame}
 
+\begin{frame}
+    \frametitle{Results?}
+    
 \end{frame}
 
 \end{document}

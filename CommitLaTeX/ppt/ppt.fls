@@ -1,8 +1,8 @@
-PWD c:/LaTeX-code/4567-project/Fourier-Project/CommitLaTeX/ppt
+PWD e:/vsprojects/LaTeX/Fourier Project/CommitLaTeX/ppt
 INPUT c:/texlive/2024/texmf.cnf
 INPUT c:/texlive/2024/texmf-dist/web2c/texmf.cnf
 INPUT c:/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT c:/LaTeX-code/4567-project/Fourier-Project/CommitLaTeX/ppt/ppt.tex
+INPUT e:/vsprojects/LaTeX/Fourier Project/CommitLaTeX/ppt/ppt.tex
 OUTPUT ppt.log
 INPUT c:/texlive/2024/texmf-dist/tex/latex/beamer/beamer.cls
 INPUT c:/texlive/2024/texmf-dist/tex/latex/beamer/beamer.cls
@@ -139,6 +139,8 @@ INPUT c:/texlive/2024/texmf-dist/tex/generic/infwarerr/infwarerr.sty
 INPUT c:/texlive/2024/texmf-dist/tex/generic/infwarerr/infwarerr.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/hycolor/hycolor.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/hycolor/hycolor.sty
+INPUT c:/texlive/2024/texmf-dist/tex/latex/auxhook/auxhook.sty
+INPUT c:/texlive/2024/texmf-dist/tex/latex/auxhook/auxhook.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/hyperref/nameref.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/hyperref/nameref.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/refcount/refcount.sty
@@ -147,8 +149,6 @@ INPUT c:/texlive/2024/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
 INPUT c:/texlive/2024/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/kvoptions/kvoptions.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/kvoptions/kvoptions.sty
-INPUT c:/texlive/2024/texmf-dist/tex/generic/stringenc/stringenc.sty
-INPUT c:/texlive/2024/texmf-dist/tex/generic/stringenc/stringenc.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/hyperref/pd1enc.def
 INPUT c:/texlive/2024/texmf-dist/tex/latex/hyperref/pd1enc.def
 INPUT c:/texlive/2024/texmf-dist/tex/latex/hyperref/pd1enc.def
@@ -358,6 +358,8 @@ OUTPUT ppt.snm
 INPUT ppt.aux
 INPUT ./ppt.out
 INPUT ./ppt.out
+INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
+INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb
