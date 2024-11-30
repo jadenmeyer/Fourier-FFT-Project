@@ -8,7 +8,7 @@
 #include <cuda_runtime.h>
 #include <cufft.h>
 #include <chrono> 
-#include <fstream>
+#include <fstream>  // For writing to a file
 
 
 //weird ass macro since CUDA is horrible
@@ -16,6 +16,7 @@
 #define C_PI 3.14159265358979323846f
 #endif
 
+// DFT Kernel for GPU
 __global__ void DFT(cuFloatComplex* a, cuFloatComplex* b, int N) {
     int index = threadIdx.x + blockIdx.x * blockDim.x; //this call tells us what like position the GPU is on (its weird)
 
@@ -27,7 +28,6 @@ __global__ void DFT(cuFloatComplex* a, cuFloatComplex* b, int N) {
             float angle = -2.0f * C_PI * index * n / N; //CUDA C++ doesn't have e so we do this and use macros for pi
             cuFloatComplex w = make_cuFloatComplex(cos(angle), sin(angle));  // e^(-2*pi*i*k*n/N) yeah this
             cuFloatComplex input_value = a[n];
-
 
             sum = cuCaddf(sum, cuCmulf(input_value, w));
         }
@@ -70,38 +70,50 @@ void clearAndReinitMemory(cuFloatComplex** d_array, cuFloatComplex** h_array, in
     cudaMemcpy(*d_array, *h_array, maxSize * sizeof(cuFloatComplex), cudaMemcpyHostToDevice);
 }
 
+// Function to write GPU times to a file
+void writeGpuTimesToFile(const std::vector<float>& DFTtimes, const std::vector<int>& sizes) {
+    std::ofstream gpuFile("gpu_times_seconds.txt");  // File to store GPU times in seconds
+    for (size_t i = 0; i < DFTtimes.size(); ++i) {
+        gpuFile << sizes[i] << " " << DFTtimes[i] / 1000.0f << "\n"; // Convert ms to seconds
+    }
+    gpuFile.close();
+}
+
+// Function to write CPU times to a file
+void writeCpuTimesToFile(const std::vector<float>& cpuTimes, const std::vector<int>& sizes) {
+    std::ofstream cpuFile("cpu_times_seconds.txt");  // File to store CPU times in seconds
+    for (size_t i = 0; i < cpuTimes.size(); ++i) {
+        cpuFile << sizes[i] << " " << cpuTimes[i] << "\n";  // Store CPU time in seconds
+    }
+    cpuFile.close();
+}
+
 int main() {
     srand(time(0));
 
-    int maxSize = 500000;  // Maximum size for arrays
-    int stepSize = 100000; // Step size for array size
+    int maxSize = 5000;  // Maximum size for arrays
+    int stepSize = 1000; // Step size for array size
     int numArrays = maxSize / stepSize; // Number of arrays to create
 
     std::vector<float> DFTtimes;
+    std::vector<float> cpuTimes;  // Vector to store CPU times
+    std::vector<int> sizes;  // Vector to store sizes for plotting
 
     // Declare host and device pointers for GPU DFT
     cuFloatComplex* h_a = nullptr;
     cuFloatComplex* h_b = nullptr;
     cuFloatComplex* d_a = nullptr;
     cuFloatComplex* d_b = nullptr;
-    //calling nullptr for memory 
 
     // Declare host arrays for CPU DFT
     std::complex<float>* h_a_cpu = nullptr;
     std::complex<float>* h_b_cpu = nullptr;
-    //this makes more sense since we are talking about
-
 
     // Declare CUDA stream for parallel execution
-    /**************************************************************************
-    * cuda stream allows for GPU to work alongside the CPU and is just a class
-    * so we instantiated an object of stream
-    ***************************************************************************/
     cudaStream_t stream;
     cudaStreamCreate(&stream);
 
     // Event timers for CUDA kernel execution
-    //also another class
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
@@ -111,12 +123,11 @@ int main() {
     clearAndReinitMemory(&d_b, &h_b, maxSize);
 
     // Allocate memory for CPU arrays with memory fill
-    // got to be careful calling new! might cause leak
     h_a_cpu = new std::complex<float>[maxSize];
     h_b_cpu = new std::complex<float>[maxSize];
 
     for (int i = 0; i < numArrays; ++i) {
-        int gpuSize = (i + 1) * stepSize; // Size of the current array for DFT (will be called in terminal)
+        int gpuSize = (i + 1) * stepSize; // Size of the current array for DFT
         float DFTtime = 0;
 
         // Print the current vector size before launching the kernel
@@ -128,9 +139,8 @@ int main() {
         // Set up the number of threads and blocks for the kernel
         int threadsinBlock = 256;
         int blocksPerGrid = (gpuSize + threadsinBlock - 1) / threadsinBlock;
-        //want this to be dependent on data set size
 
-        // Start the timer for GPU DFT (hence why we called the object)
+        // Start the timer for GPU DFT
         cudaEventRecord(start, 0);
 
         // Launch the kernel for DFT (GPU) asynchronously using a stream
@@ -149,19 +159,20 @@ int main() {
         cpuDFT(h_a_cpu, h_b_cpu, gpuSize);
 
         // Stop the CPU timing
-        // chrono is the first library that showed up this seems to work
         auto cpu_end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float> cpu_duration = cpu_end - cpu_start;
+        cpuTimes.push_back(cpu_duration.count());  // Store CPU time in seconds
         printf("CPU DFT computation time: %.6f seconds\n", cpu_duration.count());
 
-        // synch the stream and stop the timer for GPU DFT
+        // Synchronize the stream and stop the timer for GPU DFT
         cudaStreamSynchronize(stream);
         cudaEventRecord(stop, 0);
         cudaEventSynchronize(stop);
 
-        // get time for the GPU DFT and store it
+        // Get time for the GPU DFT and store it
         cudaEventElapsedTime(&DFTtime, start, stop);
-        DFTtimes.push_back(DFTtime);
+        DFTtimes.push_back(DFTtime);  // Store GPU time in ms
+        sizes.push_back(gpuSize);  // Store the current vector size for plotting
     }
 
     // Free memory
@@ -169,15 +180,18 @@ int main() {
     cudaFree(d_b);
     delete[] h_a;
     delete[] h_b;
-    //remember we had special ones just for CPU
     delete[] h_a_cpu;
     delete[] h_b_cpu;
 
-    // destructorize the stream
+    // Destroy the stream
     cudaStreamDestroy(stream);
 
+    // Write the data to separate files
+    writeGpuTimesToFile(DFTtimes, sizes);  // Write GPU times in seconds
+    writeCpuTimesToFile(cpuTimes, sizes);  // Write CPU times in seconds
+
     // Print total GPU computation time
-    //accumulate from numeric library
-    printf("Total GPU Computation Time: %f seconds\n", std::accumulate(DFTtimes.begin(), DFTtimes.end(), 0.0f) / 1000);
+    printf("Total GPU Computation Time: %f seconds\n", std::accumulate(DFTtimes.begin(), DFTtimes.end(), 0));
+
     return 0;
 }
