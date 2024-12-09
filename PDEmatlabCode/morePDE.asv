@@ -1,0 +1,37 @@
+% Define domain and parameters
+L = 10;  % Length of domain
+N = 256; % Number of grid points
+x = linspace(0, L, N); % Grid points
+dx = x(2) - x(1); % Grid spacing
+k = [0:N/2-1, -N/2:-1] * (2*pi/L); % Fourier wave numbers
+
+% Define a(x) and f(x) (these should be functions or vectors depending on x)
+a = @(x) cos(2*pi*x); % Example function a(x)
+u0 = 
+
+% FFT-based computation for u
+u = zeros(N,1); % Initial guess for u
+A = diag(a(x)); % Diagonal matrix for a(x)
+f_values = f(x); % Forcing term f(x)
+
+% Ensure f_values is a column vector
+f_values = f_values(:); 
+
+% Define the matrix operator L(u) using the Fourier method
+L_u = @(u) ifft(-k.^2 .* fft(u)) - A * u; % Ensure result is column vector
+
+% Ensure that the result is always a column vector by forcing transposition
+L_u = @(u) (ifft(-k.^2 .* fft(u)) - A * u).'; % Enforce column vector output
+
+% Solve L(u) = f using GMRES (matrix-free operator)
+tol = 1e-6; % Tolerance for GMRES
+maxIter = 1000; % Maximum iterations for GMRES
+
+% GMRES expects a function handle for the operator. We pass L_u directly.
+[u_solution, flag] = gmres(@(u) L_u(u), f_values, [], tol, maxIter);
+
+% Plot solution
+plot(x, u_solution);
+title('Solution u(x)');
+xlabel('x');
+ylabel('u(x)');
